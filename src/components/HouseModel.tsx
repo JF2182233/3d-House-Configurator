@@ -23,12 +23,12 @@ const HouseModel: React.FC = () => {
   }), []);
   
   const glassMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#a5f3fc',
-    transparent: true,
-    opacity: 0.5,
-    roughness: 0.1,
-    metalness: 0.9
-  }), []);
+  color: '#a5f3fc', // This is your light blue color
+  transparent: true,
+  opacity: 0.5,
+  roughness: 0.1,
+  metalness: 0, // <-- CHANGE THIS FROM 0.9 TO 0
+}), []);
   
   const doorMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#9f7b4f',
@@ -86,7 +86,7 @@ const HouseModel: React.FC = () => {
       {/* Window - only if toggled on */}
       {hasWindow && (
         <mesh
-          position={[0, height / 2, halfWidth + 0.11]}
+          position={[-2, height / 2, halfWidth + 0.11]}
           castShadow
         >
           <boxGeometry args={[1.5, 1.5, 0.1]} />
@@ -97,7 +97,7 @@ const HouseModel: React.FC = () => {
       {/* Door - only if toggled on */}
       {hasDoor && (
         <mesh
-          position={[length / 4, height / 4, halfWidth + 0.11]}
+          position={[length / 4, 1.0, halfWidth + 0.11]}
           castShadow
         >
           <boxGeometry args={[1.2, 2.0, 0.1]} />
