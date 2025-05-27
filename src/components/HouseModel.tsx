@@ -64,7 +64,7 @@ const HouseModel: React.FC = () => {
       context.fillStyle = '#E0B500'; // Text color (e.g., gold/yellow)
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText('JENS:)', canvas.width / 2, canvas.height / 2); // Replace 'YOUR NAME HERE' with your actual name
+      context.fillText('JENS:))', canvas.width / 2, canvas.height / 2); // Replace 'YOUR NAME HERE' with your actual name
     }
     return new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true });
   }, []);
