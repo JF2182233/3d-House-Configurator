@@ -1,13 +1,13 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import ControlPanel from './ControlPanel';
+import TabsPanel from './configurator/TabsPanel';
 import HouseModel from './HouseModel';
-import PriceDisplay from './PriceDisplay';
-import { useHouseStore } from '../store/houseStore';
+import PriceSummary from './configurator/PriceSummary';
+import { useHouseConfigStore } from '../store/houseConfigStore';
 
 const HouseConfigurator: React.FC = () => {
-  const { length, width, height } = useHouseStore();
+  const { length, width, height } = useHouseConfigStore();
   
   return (
     <div className="w-full max-w-7xl bg-white rounded-lg shadow-lg overflow-hidden flex flex-col lg:flex-row">
@@ -47,9 +47,9 @@ const HouseConfigurator: React.FC = () => {
       {/* Controls */}
       <div className="w-full lg:w-1/3 p-6 flex flex-col">
         <h2 className="text-xl font-semibold text-gray-800 mb-6">House Configuration</h2>
-        <ControlPanel />
+        <TabsPanel />
         <div className="mt-auto pt-6">
-          <PriceDisplay />
+          <PriceSummary />
         </div>
       </div>
     </div>
