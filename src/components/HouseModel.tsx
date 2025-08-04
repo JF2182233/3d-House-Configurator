@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'; // Import useRef
+import React, { useMemo } from 'react';
 import { useHouseStore } from '../store/houseStore';
 import * as THREE from 'three';
 
@@ -51,6 +51,27 @@ const HouseModel: React.FC = () => {
   // Roof
   const roofHeight = height * 0.5;
 
+  const roofGeometry = useMemo(() => {
+    const overhang = 0.2;
+    const shape = new THREE.Shape();
+    const halfW = width / 2;
+
+    shape.moveTo(-halfW - overhang, 0);
+    shape.lineTo(0, roofHeight);
+    shape.lineTo(halfW + overhang, 0);
+    shape.closePath();
+
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: length + overhang * 2,
+      bevelEnabled: false,
+    });
+
+    geometry.rotateY(Math.PI / 2);
+    geometry.translate(-(length + overhang * 2) / 2, height, 0);
+
+    return geometry;
+  }, [length, width, height, roofHeight]);
+
   // --- START NEW CODE FOR YOUR NAME ---
   const textMaterial = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -93,12 +114,7 @@ const HouseModel: React.FC = () => {
       ))}
 
       {/* Roof */}
-      <mesh
-        position={[0, height + roofHeight / 2, 0]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry args={[length + 0.4, roofHeight, width + 0.4]} />
+      <mesh geometry={roofGeometry} castShadow receiveShadow>
         <primitive object={roofMaterial} />
       </mesh>
 
