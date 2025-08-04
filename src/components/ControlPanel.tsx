@@ -3,14 +3,15 @@ import Slider from './ui/Slider';
 import Button from './ui/Button';
 import { useHouseStore } from '../store/houseStore';
 import { DoorOpen, Maximize2, Square } from 'lucide-react';
+import { windowProducts, doorProducts } from '../data/products';
 
 const ControlPanel: React.FC = () => {
   const {
     length, setLength,
     width, setWidth,
     height, setHeight,
-    hasWindow, toggleWindow,
-    hasDoor, toggleDoor
+    hasWindow, toggleWindow, windowProduct, setWindowProduct,
+    hasDoor, toggleDoor, doorProduct, setDoorProduct
   } = useHouseStore();
 
   const [activeTab, setActiveTab] = useState<'dimensions' | 'features'>('dimensions');
@@ -83,6 +84,21 @@ const ControlPanel: React.FC = () => {
               >
                 {hasWindow ? 'Remove Window' : 'Add Window'}
               </Button>
+              {hasWindow && (
+                <div className="ml-4 space-y-1">
+                  {windowProducts.map((product) => (
+                    <label key={product.id} className="flex items-center space-x-2 text-sm">
+                      <input
+                        type="radio"
+                        name="windowProduct"
+                        checked={windowProduct?.id === product.id}
+                        onChange={() => setWindowProduct(product)}
+                      />
+                      <span>{product.name} (€{product.price})</span>
+                    </label>
+                  ))}
+                </div>
+              )}
               <Button
                 onClick={toggleDoor}
                 active={hasDoor}
@@ -90,6 +106,21 @@ const ControlPanel: React.FC = () => {
               >
                 {hasDoor ? 'Remove Door' : 'Add Door'}
               </Button>
+              {hasDoor && (
+                <div className="ml-4 space-y-1">
+                  {doorProducts.map((product) => (
+                    <label key={product.id} className="flex items-center space-x-2 text-sm">
+                      <input
+                        type="radio"
+                        name="doorProduct"
+                        checked={doorProduct?.id === product.id}
+                        onChange={() => setDoorProduct(product)}
+                      />
+                      <span>{product.name} (€{product.price})</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
