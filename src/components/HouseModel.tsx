@@ -3,7 +3,9 @@ import { useHouseStore } from '../store/houseStore';
 import * as THREE from 'three';
 
 const HouseModel: React.FC = () => {
-  const { length, width, height, hasWindow, hasDoor } = useHouseStore();
+  const { length, width, height, windowOption, doorOption } = useHouseStore();
+  const hasWindow = !!windowOption;
+  const hasDoor = !!doorOption;
 
   // Calculate half dimensions for centering
   const halfLength = length / 2;

@@ -3,14 +3,14 @@ import { useHouseStore } from '../store/houseStore';
 import { calculatePrice } from '../utils/calculations';
 
 const PriceDisplay: React.FC = () => {
-  const { length, width, hasWindow, hasDoor } = useHouseStore();
-  
+  const { length, width, windowOption, doorOption } = useHouseStore();
+
   const price = calculatePrice({
     floorArea: length * width,
-    windowCount: hasWindow ? 1 : 0,
-    doorCount: hasDoor ? 1 : 0
+    windowPrice: windowOption?.price ?? 0,
+    doorPrice: doorOption?.price ?? 0,
   });
-  
+
   return (
     <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
       <h3 className="text-lg font-medium text-gray-800 mb-1">Estimated Price</h3>
@@ -20,8 +20,8 @@ const PriceDisplay: React.FC = () => {
       </div>
       <div className="mt-2 text-xs text-gray-500">
         <p>Base: {length} × {width} m² @ €200/m²</p>
-        {hasWindow && <p>Window: +€250</p>}
-        {hasDoor && <p>Door: +€400</p>}
+        {windowOption && <p>{windowOption.name}: +€{windowOption.price}</p>}
+        {doorOption && <p>{doorOption.name}: +€{doorOption.price}</p>}
       </div>
     </div>
   );

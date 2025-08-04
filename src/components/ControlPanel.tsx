@@ -3,14 +3,15 @@ import Slider from './ui/Slider';
 import Button from './ui/Button';
 import { useHouseStore } from '../store/houseStore';
 import { DoorOpen, Maximize2, Square } from 'lucide-react';
+import { windowOptions, doorOptions } from '../data/products';
 
 const ControlPanel: React.FC = () => {
   const {
     length, setLength,
     width, setWidth,
     height, setHeight,
-    hasWindow, toggleWindow,
-    hasDoor, toggleDoor
+    windowOption, selectWindow,
+    doorOption, selectDoor
   } = useHouseStore();
 
   const [activeTab, setActiveTab] = useState<'dimensions' | 'features'>('dimensions');
@@ -74,22 +75,47 @@ const ControlPanel: React.FC = () => {
         {activeTab === 'features' && (
           <div className="space-y-4">
             <h3 className="font-medium text-gray-700">Features</h3>
-            <div className="flex flex-col space-y-2">
-              {/* YOUR ORIGINAL BUTTON CODE HERE */}
-              <Button
-                onClick={toggleWindow}
-                active={hasWindow}
-                icon={<Square className="h-4 w-4" />}
-              >
-                {hasWindow ? 'Remove Window' : 'Add Window'}
-              </Button>
-              <Button
-                onClick={toggleDoor}
-                active={hasDoor}
-                icon={<DoorOpen className="h-4 w-4" />}
-              >
-                {hasDoor ? 'Remove Door' : 'Add Door'}
-              </Button>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Windows</h4>
+                <div className="flex flex-col space-y-2">
+                  {windowOptions.map((option) => (
+                    <Button
+                      key={option.id}
+                      onClick={() =>
+                        selectWindow(
+                          windowOption?.id === option.id ? null : option
+                        )
+                      }
+                      active={windowOption?.id === option.id}
+                      icon={<Square className="h-4 w-4" />}
+                    >
+                      {option.name} (€{option.price})
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 mb-2">Doors</h4>
+                <div className="flex flex-col space-y-2">
+                  {doorOptions.map((option) => (
+                    <Button
+                      key={option.id}
+                      onClick={() =>
+                        selectDoor(
+                          doorOption?.id === option.id ? null : option
+                        )
+                      }
+                      active={doorOption?.id === option.id}
+                      icon={<DoorOpen className="h-4 w-4" />}
+                    >
+                      {option.name} (€{option.price})
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}

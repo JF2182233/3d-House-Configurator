@@ -1,16 +1,17 @@
 import { create } from 'zustand';
+import { FeatureOption } from '../data/products';
 
 interface HouseState {
   length: number;
   width: number;
   height: number;
-  hasWindow: boolean;
-  hasDoor: boolean;
+  windowOption: FeatureOption | null;
+  doorOption: FeatureOption | null;
   setLength: (length: number) => void;
   setWidth: (width: number) => void;
   setHeight: (height: number) => void;
-  toggleWindow: () => void;
-  toggleDoor: () => void;
+  selectWindow: (option: FeatureOption | null) => void;
+  selectDoor: (option: FeatureOption | null) => void;
 }
 
 export const useHouseStore = create<HouseState>((set) => ({
@@ -18,12 +19,12 @@ export const useHouseStore = create<HouseState>((set) => ({
   length: 8,
   width: 6,
   height: 3,
-  hasWindow: false,
-  hasDoor: false,
-  
+  windowOption: null,
+  doorOption: null,
+
   setLength: (length) => set({ length }),
   setWidth: (width) => set({ width }),
   setHeight: (height) => set({ height }),
-  toggleWindow: () => set((state) => ({ hasWindow: !state.hasWindow })),
-  toggleDoor: () => set((state) => ({ hasDoor: !state.hasDoor })),
+  selectWindow: (option) => set({ windowOption: option }),
+  selectDoor: (option) => set({ doorOption: option }),
 }));
