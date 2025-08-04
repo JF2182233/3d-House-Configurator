@@ -17,7 +17,7 @@ const HouseModel: React.FC = () => {
   }), []);
 
   const roofMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#d97706',
+    color: '#ff00ff',
     roughness: 0.6,
     metalness: 0.1
   }), []);
