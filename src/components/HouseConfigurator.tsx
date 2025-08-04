@@ -10,9 +10,9 @@ const HouseConfigurator: React.FC = () => {
   const { length, width, height } = useHouseStore();
   
   return (
-    <div className="w-full max-w-7xl bg-white rounded-lg shadow-lg overflow-hidden flex flex-col lg:flex-row">
+    <div className="w-full max-w-7xl bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
       {/* 3D Viewer */}
-      <div className="w-full lg:w-2/3 h-[400px] lg:h-[600px] relative">
+      <div className="w-full h-[400px] md:h-[600px] relative">
         <Canvas
           camera={{ position: [10, 5, 10], fov: 50 }}
           shadows
@@ -45,10 +45,10 @@ const HouseConfigurator: React.FC = () => {
       </div>
       
       {/* Controls */}
-      <div className="w-full lg:w-1/3 p-6 flex flex-col">
+      <div className="w-full p-6 flex flex-col">
         <h2 className="text-xl font-semibold text-gray-800 mb-6">House Configuration</h2>
         <ControlPanel />
-        <div className="mt-auto pt-6">
+        <div className="mt-6">
           <PriceDisplay />
         </div>
       </div>

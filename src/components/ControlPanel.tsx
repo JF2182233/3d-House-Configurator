@@ -13,24 +13,34 @@ const ControlPanel: React.FC = () => {
     hasDoor, toggleDoor
   } = useHouseStore();
 
-  const [activeTab, setActiveTab] = useState<'dimensions' | 'features'>('dimensions');
+  const [activeTab, setActiveTab] = useState<
+    'dimensions' | 'features' | 'materials' | 'interior'
+  >('dimensions');
+
+  const tabs = [
+    { key: 'dimensions', label: 'Dimensions' },
+    { key: 'features', label: 'Features' },
+    { key: 'materials', label: 'Materials' },
+    { key: 'interior', label: 'Interior' }
+  ] as const;
 
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-200">
-        <button
-          className={`py-2 px-4 text-sm font-medium ${activeTab === 'dimensions' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('dimensions')}
-        >
-          Dimensions
-        </button>
-        <button
-          className={`py-2 px-4 text-sm font-medium ${activeTab === 'features' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('features')}
-        >
-          Features
-        </button>
+      <div className="flex border-b border-gray-200 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            className={`py-2 px-4 text-sm font-medium whitespace-nowrap ${
+              activeTab === tab.key
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Tab Content */}
@@ -39,7 +49,6 @@ const ControlPanel: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-medium text-gray-700">Dimensions</h3>
             <div className="space-y-5">
-              {/* YOUR ORIGINAL SLIDER CODE HERE */}
               <Slider
                 label="Length"
                 value={length}
@@ -75,7 +84,6 @@ const ControlPanel: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-medium text-gray-700">Features</h3>
             <div className="flex flex-col space-y-2">
-              {/* YOUR ORIGINAL BUTTON CODE HERE */}
               <Button
                 onClick={toggleWindow}
                 active={hasWindow}
@@ -92,6 +100,10 @@ const ControlPanel: React.FC = () => {
               </Button>
             </div>
           </div>
+        )}
+
+        {['materials', 'interior'].includes(activeTab) && (
+          <div className="text-gray-500">Kommer snart</div>
         )}
       </div>
     </div>
