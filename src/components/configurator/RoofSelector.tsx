@@ -1,14 +1,14 @@
 import React from 'react';
-import { roofOptions } from '../../data/roofOptions';
+import { roofCoverOptions } from '../../data/roofCoverOptions';
 import { useHouseConfigStore } from '../../store/houseConfigStore';
 
 const RoofSelector: React.FC = () => {
-  const selectedId = useHouseConfigStore((s) => s.selectedRoofId);
-  const selectRoof = useHouseConfigStore((s) => s.selectRoof);
+  const selectedId = useHouseConfigStore((s) => s.roofCoverId);
+  const selectRoof = useHouseConfigStore((s) => s.selectRoofCover);
 
   return (
     <div className="flex space-x-4 overflow-x-auto pb-2">
-      {roofOptions.map((opt) => (
+      {roofCoverOptions.map((opt) => (
         <button
           key={opt.id}
           onClick={() => selectRoof(opt.id)}

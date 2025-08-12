@@ -2,14 +2,16 @@ import React, { useMemo } from 'react';
 import * as THREE from 'three';
 import { useHouseConfigStore } from '../store/houseConfigStore';
 import { windowOptions } from '../data/windowOptions';
-import { roofOptions } from '../data/roofOptions';
+import { roofTypeOptions } from '../data/roofTypeOptions';
+import { roofCoverOptions } from '../data/roofCoverOptions';
 
 const HouseModel: React.FC = () => {
-  const { length, width, height, selectedWindowId, selectedRoofId } = useHouseConfigStore();
+  const { length, width, height, selectedWindowId, roofTypeId, roofCoverId } = useHouseConfigStore();
 
   // Derived selections
   const selectedWindow = windowOptions.find((w) => w.id === selectedWindowId);
-  const selectedRoof = roofOptions.find((r) => r.id === selectedRoofId) ?? roofOptions[0];
+  const selectedRoofType = roofTypeOptions.find((r) => r.id === roofTypeId) ?? roofTypeOptions[0];
+  const selectedRoofCover = roofCoverOptions.find((r) => r.id === roofCoverId) ?? roofCoverOptions[0];
 
   const halfLength = length / 2;
   const halfWidth = width / 2;
@@ -24,11 +26,11 @@ const HouseModel: React.FC = () => {
   const roofMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: selectedRoof.color,
+        color: selectedRoofCover.color,
         roughness: 0.6,
         metalness: 0.1,
       }),
-    [selectedRoof]
+    [selectedRoofCover]
   );
 
   const glassMaterial = useMemo(
@@ -54,7 +56,7 @@ const HouseModel: React.FC = () => {
   // Roof geometry based on selection
   const roofGeometry = useMemo(() => {
     const overhang = 0.2;
-    if (selectedRoof.type === 'gable') {
+    if (selectedRoofType.type === 'gable') {
       const roofHeight = height * 0.5;
       const shape = new THREE.Shape();
       const halfW = width / 2;
@@ -70,10 +72,26 @@ const HouseModel: React.FC = () => {
       geometry.translate(-(length + overhang * 2) / 2, height, 0);
       return geometry;
     }
+    if (selectedRoofType.type === 'shed') {
+      const slopeHeight = height * 0.5;
+      const shape = new THREE.Shape();
+      const halfW = width / 2;
+      shape.moveTo(-halfW - overhang, 0);
+      shape.lineTo(halfW + overhang, slopeHeight);
+      shape.lineTo(halfW + overhang, 0);
+      shape.closePath();
+      const geometry = new THREE.ExtrudeGeometry(shape, {
+        depth: length + overhang * 2,
+        bevelEnabled: false,
+      });
+      geometry.rotateY(Math.PI / 2);
+      geometry.translate(-(length + overhang * 2) / 2, height, 0);
+      return geometry;
+    }
     const geometry = new THREE.BoxGeometry(length + overhang * 2, 0.2, width + overhang * 2);
     geometry.translate(0, height + 0.1, 0);
     return geometry;
-  }, [selectedRoof, length, width, height]);
+  }, [selectedRoofType, length, width, height]);
 
   return (
     <group>

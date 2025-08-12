@@ -1,114 +1,98 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Tab } from '@headlessui/react';
+import Slider from '../ui/Slider';
 import RoofSelector from './RoofSelector';
 import WindowSelector from './WindowSelector';
-import Slider from '../ui/Slider';
+import { roofTypeOptions } from '../../data/roofTypeOptions';
+import { doorOptions } from '../../data/doorOptions';
+import { gateOptions } from '../../data/gateOptions';
 import { useHouseConfigStore } from '../../store/houseConfigStore';
 
 const TabsPanel: React.FC = () => {
-  const { length, width, height, setLength, setWidth, setHeight } = useHouseConfigStore();
-
-  const [outerRoofMaterial, setOuterRoofMaterial] = useState('tile');
-  const [outerRoofColor, setOuterRoofColor] = useState('#d97706');
-  type ExtensionKey = 'garage' | 'carport' | 'balcony';
-  const [extensions, setExtensions] = useState<Record<ExtensionKey, boolean>>({
-    garage: false,
-    carport: false,
-    balcony: false,
-  });
-  const [facadeMaterial, setFacadeMaterial] = useState('wood');
-  const [facadeColor, setFacadeColor] = useState('#ffffff');
-  const [doorType, setDoorType] = useState('single');
-  const [doorColor, setDoorColor] = useState('#6b7280');
-  const [gateType, setGateType] = useState('none');
-  const [foundationType, setFoundationType] = useState('slab');
-  const [wallMaterial, setWallMaterial] = useState('timber');
+  const store = useHouseConfigStore();
 
   const tabs = [
     {
       label: 'Form',
       content: (
         <div className="space-y-4">
-          <Slider
-            label="Length"
-            value={length}
-            onChange={(v) => setLength(v)}
-            min={4}
-            max={12}
-            step={0.1}
-          />
-          <Slider
-            label="Width"
-            value={width}
-            onChange={(v) => setWidth(v)}
-            min={4}
-            max={10}
-            step={0.1}
-          />
-          <Slider
-            label="Height"
-            value={height}
-            onChange={(v) => setHeight(v)}
-            min={2}
-            max={5}
-            step={0.1}
-          />
+          <Slider label="Bredd" value={store.width} onChange={store.setWidth} min={4} max={10} step={0.1} />
+          <Slider label="Längd" value={store.length} onChange={store.setLength} min={4} max={12} step={0.1} />
+          <Slider label="Vägg höjd" value={store.height} onChange={store.setHeight} min={2} max={5} step={0.1} />
+          <label className="block">
+            <span className="text-sm font-medium">Carport</span>
+            <select
+              value={store.carportSide}
+              onChange={(e) =>
+                store.setCarportSide(e.target.value as 'none' | 'short' | 'long')
+              }
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value="none">Ingen</option>
+              <option value="short">Kortsida</option>
+              <option value="long">Långsida</option>
+            </select>
+          </label>
         </div>
       ),
     },
-    { label: 'Taktyp', content: <RoofSelector /> },
     {
-      label: 'Yttertak',
+      label: 'Taktyp',
       content: (
         <div className="space-y-4">
+          <div>
+            <span className="text-sm font-medium">Taktyp</span>
+            <div className="mt-2 flex space-x-2">
+              {roofTypeOptions.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => store.selectRoofType(opt.id)}
+                  className={`px-3 py-1 rounded border text-sm ${
+                    store.roofTypeId === opt.id ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300'
+                  }`}
+                >
+                  {opt.name}
+                </button>
+              ))}
+            </div>
+          </div>
           <label className="block">
-            <span className="text-sm font-medium">Material</span>
+            <span className="text-sm font-medium">Konstruktion</span>
             <select
-              value={outerRoofMaterial}
-              onChange={(e) => setOuterRoofMaterial(e.target.value)}
+              value={store.roofConstruction}
+              onChange={(e) =>
+                store.setRoofConstruction(e.target.value as 'fackverk' | 'as')
+              }
               className="mt-1 block w-full border rounded-md p-2"
             >
-              <option value="tile">Tegelpannor</option>
-              <option value="metal">Plåt</option>
-              <option value="shingle">Shingel</option>
+              <option value="fackverk">Fackverk</option>
+              <option value="as">Ås/sparrtak</option>
             </select>
           </label>
           <label className="block">
-            <span className="text-sm font-medium">Färg</span>
-            <input
-              type="color"
-              value={outerRoofColor}
-              onChange={(e) => setOuterRoofColor(e.target.value)}
-              className="mt-1"
-            />
+            <span className="text-sm font-medium">Undertak</span>
+            <select
+              value={store.underRoof}
+              onChange={(e) =>
+                store.setUnderRoof(e.target.value as 'kondensduk' | 'rospont')
+              }
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value="kondensduk">Kondensduk (0 kr)</option>
+              <option value="rospont">Råspont &amp; papp (+7 400 kr)</option>
+            </select>
           </label>
         </div>
       ),
     },
+    { label: 'Yttertak', content: <RoofSelector /> },
     {
       label: 'Utbyggnader',
       content: (
-        <div className="space-y-2">
-          {(
-            [
-              { key: 'garage', label: 'Garage' },
-              { key: 'carport', label: 'Carport' },
-              { key: 'balcony', label: 'Balkong' },
-            ] as { key: ExtensionKey; label: string }[]
-          ).map((opt) => (
-            <label key={opt.key} className="flex items-center">
-              <input
-                type="checkbox"
-                className="mr-2"
-                checked={extensions[opt.key]}
-                onChange={() =>
-                  setExtensions((prev) => ({ ...prev, [opt.key]: !prev[opt.key] }))
-                }
-              />
-              {opt.label}
-            </label>
-          ))}
-        </div>
+        <label className="flex items-center space-x-2">
+          <input type="checkbox" checked={store.extensionPorch} onChange={store.toggleExtensionPorch} />
+          <span>Farstukvist/veranda (+18 700 kr)</span>
+        </label>
       ),
     },
     {
@@ -116,94 +100,96 @@ const TabsPanel: React.FC = () => {
       content: (
         <div className="space-y-4">
           <label className="block">
-            <span className="text-sm font-medium">Material</span>
+            <span className="text-sm font-medium">Kulör</span>
             <select
-              value={facadeMaterial}
-              onChange={(e) => setFacadeMaterial(e.target.value)}
+              value={store.facadeColor}
+              onChange={(e) =>
+                store.setFacadeColor(e.target.value as 'obehandlad' | 'oljgrund' | 'falu')
+              }
               className="mt-1 block w-full border rounded-md p-2"
             >
-              <option value="wood">Trä</option>
-              <option value="brick">Tegel</option>
-              <option value="plaster">Puts</option>
+              <option value="obehandlad">Obehandlad (0 kr)</option>
+              <option value="oljgrund">Oljgrund (+3 400 kr)</option>
+              <option value="falu">Falu röd (+3 400 kr)</option>
             </select>
           </label>
           <label className="block">
-            <span className="text-sm font-medium">Färg</span>
-            <input
-              type="color"
-              value={facadeColor}
-              onChange={(e) => setFacadeColor(e.target.value)}
-              className="mt-1"
-            />
+            <span className="text-sm font-medium">Panelriktning</span>
+            <select
+              value={store.panelDirection}
+              onChange={(e) =>
+                store.setPanelDirection(e.target.value as 'stående' | 'liggande')
+              }
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value="stående">Stående</option>
+              <option value="liggande">Liggande</option>
+            </select>
           </label>
         </div>
       ),
     },
     { label: 'Fönster', content: <WindowSelector /> },
     {
-      label: 'Dörrar',
+      label: 'Ytterdörrar',
       content: (
-        <div className="space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium">Typ</span>
-            <select
-              value={doorType}
-              onChange={(e) => setDoorType(e.target.value)}
-              className="mt-1 block w-full border rounded-md p-2"
-            >
-              <option value="single">Enkel</option>
-              <option value="double">Dubbel</option>
-              <option value="sliding">Skjutdörr</option>
-            </select>
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium">Färg</span>
-            <input
-              type="color"
-              value={doorColor}
-              onChange={(e) => setDoorColor(e.target.value)}
-              className="mt-1"
-            />
-          </label>
-        </div>
+        <label className="block">
+          <span className="text-sm font-medium">Modell</span>
+          <select
+            value={store.doorId ?? ''}
+            onChange={(e) => store.selectDoor(e.target.value || null)}
+            className="mt-1 block w-full border rounded-md p-2"
+          >
+            <option value="">Ingen</option>
+            {doorOptions.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name} (+{d.price.toLocaleString()} kr)
+              </option>
+            ))}
+          </select>
+        </label>
       ),
     },
     {
       label: 'Portar',
       content: (
-        <div className="space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium">Typ</span>
-            <select
-              value={gateType}
-              onChange={(e) => setGateType(e.target.value)}
-              className="mt-1 block w-full border rounded-md p-2"
-            >
-              <option value="none">Ingen</option>
-              <option value="single">Enkel</option>
-              <option value="double">Dubbel</option>
-            </select>
-          </label>
-        </div>
+        <label className="block">
+          <span className="text-sm font-medium">Typ</span>
+          <select
+            value={store.gateId ?? ''}
+            onChange={(e) => store.selectGate(e.target.value || null)}
+            className="mt-1 block w-full border rounded-md p-2"
+          >
+            <option value="">Ingen</option>
+            {gateOptions.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name} (+{g.price.toLocaleString()} kr)
+              </option>
+            ))}
+          </select>
+        </label>
       ),
     },
     {
       label: 'Grund',
       content: (
-        <div className="space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium">Grundtyp</span>
-            <select
-              value={foundationType}
-              onChange={(e) => setFoundationType(e.target.value)}
-              className="mt-1 block w-full border rounded-md p-2"
-            >
-              <option value="slab">Platta på mark</option>
-              <option value="crawl">Krypgrund</option>
-              <option value="basement">Källare</option>
-            </select>
-          </label>
-        </div>
+        <label className="block">
+          <span className="text-sm font-medium">Typ</span>
+          <select
+            value={store.foundation}
+            onChange={(e) =>
+              store.setFoundation(
+                e.target.value as 'none' | 'betong300' | 'betong400' | 'bjalklag'
+              )
+            }
+            className="mt-1 block w-full border rounded-md p-2"
+          >
+            <option value="none">Ingen (0 kr)</option>
+            <option value="betong300">Betong 300 mm (+19 200 kr)</option>
+            <option value="betong400">Betong 400 mm (+21 200 kr)</option>
+            <option value="bjalklag">Bjälklag i trä (+11 000 kr)</option>
+          </select>
+        </label>
       ),
     },
     {
@@ -211,17 +197,71 @@ const TabsPanel: React.FC = () => {
       content: (
         <div className="space-y-4">
           <label className="block">
-            <span className="text-sm font-medium">Material</span>
+            <span className="text-sm font-medium">Stomme</span>
             <select
-              value={wallMaterial}
-              onChange={(e) => setWallMaterial(e.target.value)}
+              value={store.frame}
+              onChange={(e) => store.setFrame(e.target.value as '145' | '195')}
               className="mt-1 block w-full border rounded-md p-2"
             >
-              <option value="timber">Träpanel</option>
-              <option value="brick">Tegel</option>
-              <option value="concrete">Betong</option>
+              <option value="145">145 mm (0 kr)</option>
+              <option value="195">195 mm (+1 500 kr)</option>
             </select>
           </label>
+          <label className="block">
+            <span className="text-sm font-medium">Isolering</span>
+            <select
+              value={store.insulation}
+              onChange={(e) =>
+                store.setInsulation(e.target.value as 'none' | 'paket')
+              }
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value="none">Ingen (0 kr)</option>
+              <option value="paket">Isoleringspaket (+18 500 kr)</option>
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium">Installationsskikt</span>
+            <select
+              value={store.installLayer}
+              onChange={(e) =>
+                store.setInstallLayer(e.target.value as 'none' | 'med')
+              }
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value="none">Ingen (0 kr)</option>
+              <option value="med">Med skikt (+3 300 kr)</option>
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium">Invändigt ytskikt</span>
+            <select
+              value={store.innerFinish}
+              onChange={(e) =>
+                store.setInnerFinish(e.target.value as 'none' | 'osb')
+              }
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value="none">Ingen (0 kr)</option>
+              <option value="osb">OSB &amp; gips (+12 600 kr)</option>
+            </select>
+          </label>
+        </div>
+      ),
+    },
+    {
+      label: 'Interiör',
+      content: (
+        <div className="space-y-4">
+          <p>Innervägg: inget prispåslag</p>
+          <Slider
+            label="Innerdörr 9x21 antal"
+            value={store.innerDoorCount}
+            onChange={store.setInnerDoorCount}
+            min={0}
+            max={10}
+            step={1}
+          />
         </div>
       ),
     },
