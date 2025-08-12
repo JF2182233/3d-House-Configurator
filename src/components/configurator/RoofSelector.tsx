@@ -17,7 +17,6 @@ const RoofSelector: React.FC = () => {
           <img src={opt.texture} alt={opt.name} className="w-full h-20 object-cover rounded" />
           <div className="mt-2 text-sm text-center">
             <p className="font-medium text-gray-700">{opt.name}</p>
-            <p className="text-gray-500 text-xs">+{opt.price.toLocaleString()} kr</p>
           </div>
         </button>
       ))}
