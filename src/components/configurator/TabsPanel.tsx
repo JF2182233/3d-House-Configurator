@@ -16,9 +16,9 @@ const TabsPanel: React.FC = () => {
       label: 'Form',
       content: (
         <div className="space-y-4">
-          <Slider label="Bredd" value={store.width} onChange={store.setWidth} min={4} max={10} step={0.1} />
-          <Slider label="Längd" value={store.length} onChange={store.setLength} min={4} max={12} step={0.1} />
-          <Slider label="Vägg höjd" value={store.height} onChange={store.setHeight} min={2} max={5} step={0.1} />
+          <Slider label="Bredd" value={store.width} onChange={store.setWidth} min={2.4} max={10} step={0.1} />
+          <Slider label="Längd" value={store.length} onChange={store.setLength} min={2.4} max={26} step={0.1} />
+          <Slider label="Vägg höjd" value={store.height} onChange={store.setHeight} min={2.2} max={4.7} step={0.1} />
           <label className="block">
             <span className="text-sm font-medium">Carport</span>
             <select
