@@ -30,7 +30,13 @@ const Slider: React.FC<SliderProps> = ({
           {icon && <span className="mr-1.5">{icon}</span>}
           {label}
         </label>
-        <span className="text-sm font-medium text-blue-600">{value.toFixed(1)} m</span>
+        <span className="text-sm font-medium text-blue-600">
+          {value.toLocaleString('sv-SE', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })}{' '}
+          m
+        </span>
       </div>
       <input
         type="range"
@@ -42,8 +48,8 @@ const Slider: React.FC<SliderProps> = ({
         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
       />
       <div className="flex justify-between text-xs text-gray-500">
-        <span>{min}m</span>
-        <span>{max}m</span>
+        <span>{min.toLocaleString('sv-SE')}m</span>
+        <span>{max.toLocaleString('sv-SE')}m</span>
       </div>
     </div>
   );

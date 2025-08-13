@@ -1,95 +1,97 @@
 import React, { useMemo } from 'react';
-import { useHouseStore } from '../store/houseStore';
 import * as THREE from 'three';
+import { useHouseConfigStore } from '../store/houseConfigStore';
+import { windowOptions } from '../data/windowOptions';
+import { roofTypeOptions } from '../data/roofTypeOptions';
+import { roofCoverOptions } from '../data/roofCoverOptions';
 
 const HouseModel: React.FC = () => {
-  const { length, width, height, hasWindow, hasDoor } = useHouseStore();
+  const { length, width, height, selectedWindowId, roofTypeId, roofCoverId } = useHouseConfigStore();
 
-  // Calculate half dimensions for centering
+  // Derived selections
+  const selectedWindow = windowOptions.find((w) => w.id === selectedWindowId);
+  const selectedRoofType = roofTypeOptions.find((r) => r.id === roofTypeId) ?? roofTypeOptions[0];
+  const selectedRoofCover = roofCoverOptions.find((r) => r.id === roofCoverId) ?? roofCoverOptions[0];
+
   const halfLength = length / 2;
   const halfWidth = width / 2;
 
-  // Wall and roof materials
-  const wallMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#ffffff',
-    roughness: 0.7,
-    metalness: 0.1
-  }), []);
+  // Materials
+  const wallMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7, metalness: 0.1 }),
+    []
+  );
 
-  const roofMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#ff00ff',
-    roughness: 0.6,
-    metalness: 0.1
-  }), []);
+  const roofMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: selectedRoofCover.color,
+        roughness: 0.6,
+        metalness: 0.1,
+      }),
+    [selectedRoofCover]
+  );
 
-  const glassMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#a5f3fc', // This is your light blue color
-    transparent: true,
-    opacity: 0.5,
-    roughness: 0.1,
-    metalness: 0,
-  }), []);
-
-  const doorMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#9f7b4f',
-    roughness: 0.5,
-    metalness: 0.2
-  }), []);
+  const glassMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#a5f3fc',
+        transparent: true,
+        opacity: 0.5,
+        roughness: 0.1,
+        metalness: 0,
+      }),
+    []
+  );
 
   // Wall positions
   const walls = [
-    // Front wall (with window and door)
-    { position: [0, height / 2, halfWidth], rotation: [0, 0, 0], size: [length, height, 0.2] },
-    // Back wall
-    { position: [0, height / 2, -halfWidth], rotation: [0, 0, 0], size: [length, height, 0.2] },
-    // Left wall
-    { position: [-halfLength, height / 2, 0], rotation: [0, Math.PI / 2, 0], size: [width, height, 0.2] },
-    // Right wall
-    { position: [halfLength, height / 2, 0], rotation: [0, Math.PI / 2, 0], size: [width, height, 0.2] },
+    { position: [0, height / 2, halfWidth], rotation: [0, 0, 0], size: [length, height, 0.2] }, // Front
+    { position: [0, height / 2, -halfWidth], rotation: [0, 0, 0], size: [length, height, 0.2] }, // Back
+    { position: [-halfLength, height / 2, 0], rotation: [0, Math.PI / 2, 0], size: [width, height, 0.2] }, // Left
+    { position: [halfLength, height / 2, 0], rotation: [0, Math.PI / 2, 0], size: [width, height, 0.2] }, // Right
   ];
 
-  // Roof
-  const roofHeight = height * 0.5;
-
+  // Roof geometry based on selection
   const roofGeometry = useMemo(() => {
     const overhang = 0.2;
-    const shape = new THREE.Shape();
-    const halfW = width / 2;
-
-    shape.moveTo(-halfW - overhang, 0);
-    shape.lineTo(0, roofHeight);
-    shape.lineTo(halfW + overhang, 0);
-    shape.closePath();
-
-    const geometry = new THREE.ExtrudeGeometry(shape, {
-      depth: length + overhang * 2,
-      bevelEnabled: false,
-    });
-
-    geometry.rotateY(Math.PI / 2);
-    geometry.translate(-(length + overhang * 2) / 2, height, 0);
-
-    return geometry;
-  }, [length, width, height, roofHeight]);
-
-  // --- START NEW CODE FOR YOUR NAME ---
-  const textMaterial = useMemo(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512; // A power of 2 for textures
-    canvas.height = 128;
-    const context = canvas.getContext('2d');
-    if (context) {
-      context.fillStyle = '#222222'; // Background for the text plane
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.font = 'Bold 80px Arial'; // Adjust font size and type as needed
-      context.fillStyle = '#E0B500'; // Text color (e.g., gold/yellow)
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      context.fillText('JENS:))', canvas.width / 2, canvas.height / 2); // Replace 'YOUR NAME HERE' with your actual name
+    if (selectedRoofType.type === 'gable') {
+      const roofHeight = height * 0.5;
+      const shape = new THREE.Shape();
+      const halfW = width / 2;
+      shape.moveTo(-halfW - overhang, 0);
+      shape.lineTo(0, roofHeight);
+      shape.lineTo(halfW + overhang, 0);
+      shape.closePath();
+      const geometry = new THREE.ExtrudeGeometry(shape, {
+        depth: length + overhang * 2,
+        bevelEnabled: false,
+      });
+      geometry.rotateY(Math.PI / 2);
+      geometry.translate(-(length + overhang * 2) / 2, height, 0);
+      return geometry;
     }
-    return new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true });
-  }, []);
-  // --- END NEW CODE FOR YOUR NAME ---
+    if (selectedRoofType.type === 'shed') {
+      const slopeHeight = height * 0.5;
+      const shape = new THREE.Shape();
+      const halfW = width / 2;
+      shape.moveTo(-halfW - overhang, 0);
+      shape.lineTo(halfW + overhang, slopeHeight);
+      shape.lineTo(halfW + overhang, 0);
+      shape.closePath();
+      const geometry = new THREE.ExtrudeGeometry(shape, {
+        depth: length + overhang * 2,
+        bevelEnabled: false,
+      });
+      geometry.rotateY(Math.PI / 2);
+      geometry.translate(-(length + overhang * 2) / 2, height, 0);
+      return geometry;
+    }
+    const geometry = new THREE.BoxGeometry(length + overhang * 2, 0.2, width + overhang * 2);
+    geometry.translate(0, height + 0.1, 0);
+    return geometry;
+  }, [selectedRoofType, length, width, height]);
 
   return (
     <group>
@@ -101,13 +103,7 @@ const HouseModel: React.FC = () => {
 
       {/* Walls */}
       {walls.map((wall, index) => (
-        <mesh
-          key={`wall-${index}`}
-          position={wall.position}
-          rotation={wall.rotation}
-          castShadow
-          receiveShadow
-        >
+        <mesh key={`wall-${index}`} position={wall.position} rotation={wall.rotation} castShadow receiveShadow>
           <boxGeometry args={wall.size} />
           <primitive object={wallMaterial} />
         </mesh>
@@ -118,40 +114,16 @@ const HouseModel: React.FC = () => {
         <primitive object={roofMaterial} />
       </mesh>
 
-      {/* Window - only if toggled on */}
-      {hasWindow && (
+      {/* Window */}
+      {selectedWindow && (
         <mesh
-          position={[-2, height / 2, halfWidth + 0.11]}
+          position={[-length / 4, height / 2, halfWidth + 0.11]}
           castShadow
         >
-          <boxGeometry args={[1.5, 1.5, 0.1]} />
+          <boxGeometry args={[selectedWindow.size[0], selectedWindow.size[1], 0.1]} />
           <primitive object={glassMaterial} />
         </mesh>
       )}
-
-      {/* Door - only if toggled on */}
-      {hasDoor && (
-        <mesh
-          position={[length / 4, 1.0, halfWidth + 0.11]}
-          castShadow
-        >
-          <boxGeometry args={[1.2, 2.0, 0.1]} />
-          <primitive object={doorMaterial} />
-        </mesh>
-      )}
-
-      {/* --- START NEW MESH FOR YOUR NAME --- */}
-      {/* Positioned on the front wall (index 0 in walls array) */}
-      <mesh
-        position={[0, height / 2 + 1, halfWidth + 0.11]} // Adjust Y (height) and Z (offset from wall) as needed
-        rotation={[0, 0, 0]}
-        castShadow
-      >
-        <planeGeometry args={[2, 0.5]} /> {/* Adjust size of the plane for your name */}
-        <primitive object={textMaterial} />
-      </mesh>
-      {/* --- END NEW MESH FOR YOUR NAME --- */}
-
     </group>
   );
 };
